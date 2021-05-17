@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('DSI App (BSI UFRPE)'),
+        title: Text('Tópico 3 DSI App (BSI UFRPE)'),
       ),
       body: _pages[_pageIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -60,6 +60,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+      //botão de adicionar nova frase
       floatingActionButton: FloatingActionButton(
         onPressed: () =>
             Navigator.pushNamed(context, WordPairUpdatePage.routeName),
@@ -132,32 +133,63 @@ class _WordPairListPageState extends State<WordPairListPage> {
     setState(() {});
   }
 
-  ///Constroi a listagem de itens.
+  ///Pesquisa itens e Constroi a listagem de itens.
   ///Note que é dobrada a quantidade de itens, para que a cada índice par, se
   ///inclua um separador ([Divider]) na listagem.
-  @override
+  TextEditingController filtroNomes = new TextEditingController();
+  
+   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: items.length * 2,
-        itemBuilder: (BuildContext _context, int i) {
-          if (i.isOdd) {
-            return Divider();
-          }
-          final int index = i ~/ 2;
-          return _buildRow(context, index + 1, items.elementAt(index));
-        });
+    return Column(
+      children: <Widget>[
+      TextField(
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.all(10.0),
+            hintText: 'Escreva o nome desejado',
+          ),
+          onChanged: (text) {
+            setState(() {
+              _controller.pesquisar(text);
+            });
+
+          }),
+      Expanded(
+        child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: items.length * 2,
+            itemBuilder: (BuildContext _context, int i) {
+              if (i.isOdd) {
+                return Divider();
+              }
+              final int index = i ~/ 2;
+              return _buildRow(context, index + 1, items.elementAt(index));
+            }),
+      ),
+    ]);
   }
 
   ///Constroi uma linha da listagem a partir do par de palavras e do índice.
   Widget _buildRow(BuildContext context, int index, DSIWordPair wordPair) {
-    return ListTile(
-      title: Text('$index. ${wordPair}'),
-      trailing: TextButton(
-        onPressed: () => _toggleFavourite(wordPair),
-        child: _icons[wordPair.favourite],
+    return Dismissible(
+      key: UniqueKey(),
+      child: ListTile(
+        title: Text('$index. ${wordPair}'),
+        trailing: TextButton(
+          onPressed: () => _toggleFavourite(wordPair),
+          child: _icons[wordPair.favourite],
+        ),
+        onTap: () => _updateWordPair(context, wordPair),
       ),
-      onTap: () => _updateWordPair(context, wordPair),
+      onDismissed: (direction) => {
+        setState(() {
+          _controller.delete(wordPair);
+        })
+      },
+      background: Container(
+          color: Colors.red,
+          child: Center(
+            child: Text("Excluir Linha", style: TextStyle(color: Colors.white)),
+          )),
     );
   }
 
@@ -197,7 +229,7 @@ class _WordPairUpdatePageState extends State<WordPairUpdatePage> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('DSI App (BSI UFRPE)'),
+        title: Text('Topico 3 DSI App (BSI UFRPE)'),
       ),
       body: _buildForm(context),
     );

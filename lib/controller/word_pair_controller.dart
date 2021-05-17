@@ -5,6 +5,7 @@ int _nextWordPairId = 1;
 
 ///Lista de pares de palavras ([DSIWordPair]).
 List<DSIWordPair> _wordPairs;
+List<DSIWordPair> _wordPairsList;
 
 ///Controlador do módulo de pares de palavras.
 class DSIWordPairController {
@@ -24,6 +25,7 @@ class DSIWordPairController {
       _wordPairs.add(wordPair);
     }
     _wordPairs.sort();
+    _wordPairsList = _wordPairs;
   }
 
   ///Retorna uma lista com todos os pares de palavras cadastrados.
@@ -66,6 +68,16 @@ class DSIWordPairController {
     }
     _wordPairs.add(wordPair);
     _wordPairs.sort();
+  }
+
+  void pesquisar(input){
+    _wordPairs = _wordPairsList;
+    _wordPairs = _wordPairs.where(
+      (element){
+        final label = '${element.first} ${element.second}';
+        return label.toLowerCase().startsWith(input.toLowerCase());
+      }
+    );
   }
 
   ///Remove o par de palavras.
